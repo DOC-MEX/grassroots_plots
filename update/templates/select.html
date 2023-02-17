@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <meta charset="utf-8" />
+        <title>Select study</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    </head>
+    <body>
+        <h1>Select study</h1>
+        
+                
+        <form id="study-form" action="" method="post">
+            {% csrf_token %}
+            <select name="study-select" id="study">
+                <option selected="selected" disabled="disabled">Select study</option>
+                {% for key, value in options.items %}
+                    <option value="{{ key }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <br>
+            <input type="submit" value="Select Study" />
+         </form>
+            
+          
+        
+        
+        <script>
+
+        // listen for the form submission event
+        document.getElementById("study-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        // retrieve the selected value from the dropdown list
+        var selectElement = document.getElementById("study").value;
+        //var selectedValue = selectElement.options[selectElement.selectedIndex].value;
+
+        // display the selected value on the page
+        var outputElement = document.getElementById("selected-study");
+        outputElement.innerHTML = "study unique ID: " + selectElement;
+        console.log(selectElement);    
+        // submit the form to the server
+        this.submit();
+    });
+
+        /////function getSelectedValue() {
+
+        // retrieve the selected value from the dropdown list
+        ////var selectElement = document.getElementById("study").value;
+        ///console.log(selectElement);
+        
+        // display the selectedElement value on the page
+        ///var outputElement = document.getElementById("selected-study");
+        ///outputElement.innerHTML = "study unique ID: " + selectElement;
+        
+        ///}
+
+        </script>
+              
+        <p id="selected-study"></p>
+
+    </body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <meta charset="utf-8" />
+        <title>Select study</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    </head>
+    <body>
+        <h1>Select study</h1>
+        
+                
+        <form id="study-form" action="" method="post">
+            <select name="study-select" id="study" onchange="getSelectedValue()">
+                <option selected="selected" disabled="disabled">Select study</option>
+                <option value=""></option>
+                {% for key, value in options.items %}
+                    <option value="{{ key }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="load" />
+         </form>
+            
+          
+        
+        
+            <script>
+
+            //    function getSelectedValue() {
+            //        d = document.getElementById("study").value;
+            //        alert(d);
+            //    }
+            function getSelectedValue() {
+
+        
+
+        // retrieve the selected value from the dropdown list
+        var selectElement = document.getElementById("study").value;
+        console.log(selectElement);
+        
+        // display the selectedElement value on the page
+        //document.getElementById("selected-study").innerHTML = selectElement;
+        var outputElement = document.getElementById("selected-study");
+        outputElement.innerHTML = "study unique ID: " + selectElement;
+        
+                 }
+
+                </script>
+        
+       
+        <p id="selected-study"></p>
+
+    </body>
+</html>

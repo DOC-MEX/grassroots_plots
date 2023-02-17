@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Plot update</title>
+    </head>
+    <body>
+        <strong>{{ studyName }}</strong> 
+        <p>
+        
+        
+         Current phenotypes used in study:
+         &nbsp
+        <!-- show values of traits in dropdown menu --> 
+        <select id="trait">
+            <option selected="selected" disabled="disabled">List of traits in study</option>
+            {% for key, value in traits.items %}
+                <option value="{{ key }}">{{ value }}</option>
+            {% endfor %}
+        </select>           
+        </p>
+        Total number of plots: {{ nPlots }}. &nbsp &nbsp &nbsp
+        <p>
+           <b> Select plot to update: </b>
+            <form id="plot-form" action="" method="post">
+                {% csrf_token %}
+                <select name="plot-select" id="plot">
+                    <option selected="selected" disabled="disabled">Select plot ID</option>
+                    {% for key, value in plots.items %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <br>
+                <input type="submit" value="Load Plot" />
+            
+        </p>
+
+        <p>
+        <!-- return no selectStudy-->
+        <br>
+        <a href = "{% url 'selectStudy' %}">Return to main select study menu</a>  
+        </p>
+
+    </body>
+</html>

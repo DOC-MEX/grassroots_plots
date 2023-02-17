@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <meta charset="utf-8" />
+        <title>Plot Details</title>
+        
+    </head>
+    <body>
+        
+        
+        <strong>{{ studyName }}</strong> 
+        <p>
+            plot {{plotIndex}}
+        </p>
+
+        Row: {{ row }},   column: {{ column }} <br>
+        Accession: {{ accession }} <br>
+                 
+        <p>
+            <!-- return no selectStudy-->
+            <br>
+            <a href = "{% url 'updatePlot' study_id=studyID %}">Return study menu</a>  
+            </p>
+        
+        
+       
+
+       
+              
+       
+
+    </body>
+</html>
