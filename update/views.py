@@ -9,7 +9,9 @@ from django.urls import reverse
 
 from .grassroots_fieldtrial_requests import get_all_fieldtrials
 from .grassroots_fieldtrial_requests import get_plot
+
 from .grassroots_plots import dict_phenotypes
+from .grassroots_plots import get_trait
 
 # list all studies
 def selectStudy(request):
@@ -105,23 +107,65 @@ def plotDetails(request, plot_id, study_id):    # thirs page. plotDetails.html
     studyName = study['results'][0]['results'][0]['data']['so:name']
 
     plots = study['results'][0]['results'][0]['data']['plots'] 
-    accession = None 
+    accession = None
+    phenotype = None
+
+    rawValues = []
+    phenoVariables = [] 
+    traits     = []
+    units      = []
     for j in range(len(plots)):
-        if (plot_id in plots[j]['_id']['$oid']):
+        if (plot_id in plots[j]['_id']['$oid']):  # FIND PLOT
             if ('rows' in plots[j]):
                 plotIndex  = plots[j]['rows'][0]['study_index']
                 print("found plot ", plotIndex)
                 if ('material' in plots[j]['rows'][0]):
                     accession = plots[j]['rows'][0]['material']['accession']
+                if ('observations' in plots[j]['rows'][0]):
+                    # Get data from particular plot. phenotypes and raw values
+                    for k in range(len(plots[j]['rows'][0]['observations'])):
+                        phenotype = plots[j]['rows'][0]['observations'][k]['phenotype']['variable']
+                        phenoVariables.append(phenotype)
+                        if ('raw_value' in plots[j]['rows'][0]['observations'][k]):
+                            raw_value = plots[j]['rows'][0]['observations'][k]['raw_value']
+                            rawValues.append(raw_value)
+                        if ('corrected_value' in plots[j]['rows'][0]['observations'][k]):
+                            raw_value = plots[j]['rows'][0]['observations'][k]['corrected_value']
+                            rawValues.append(raw_value)
 
+                        #print("phenotype: ", phenotype, raw_value)
+                        
             row    = plots[j]['row_index'] 
             column = plots[j]['column_index'] 
 
             if accession == None:                
-                accession = 'No data'
+                accession = 'No accession'
 
+    if  "phenotypes" in study['results'][0]['results'][0]['data']: 
+        phenotypes = study['results'][0]['results'][0]['data']['phenotypes']  # Details of all the phenotypes
+    else:
+        phenotypes = {'No Data': 'No Data'}  
+    
+    # Get trait data from each phenotype in current plot
+    for i in range(len(phenoVariables)): 
+        trait, unit = get_trait(phenoVariables[i], phenotypes)
+        traits.append(trait)
+        units.append(unit)
 
+        #print(rawValues)
+        #print(units)
+        matrix=[rawValues, traits]
+        matrix=list(zip(traits, rawValues, units))
+
+    if len(phenoVariables)==0:
+        matrix = None
+        rawValues = None
+        traits = None
+        units = None
+    
+    
 
     return render(request, 'plotDetails.html', {'plotID': plot_id, 'studyID': study_id,
         'studyName': studyName, 'row':row, 'column':column, 'accession':accession,
-        'plotIndex':plotIndex})
+        'plotIndex':plotIndex, 'matrix':matrix,  
+        'rawValues':rawValues, 'traits':traits, 'iterator':range(1,2)})

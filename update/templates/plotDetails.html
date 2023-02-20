@@ -3,6 +3,19 @@
     <head>
         {% load static %}
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+
+        <!-- jQuery library -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- DataTables plugin JavaScript -->
+        <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+
+        <!-- DataTables plugin CSS -->
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">        
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
         <title>Plot Details</title>
         
     </head>
@@ -13,10 +26,43 @@
         <p>
             plot {{plotIndex}}
         </p>
-
+        <p>
         Row: {{ row }},   column: {{ column }} <br>
         Accession: {{ accession }} <br>
-                 
+        </p>
+                
+        
+        <table id="myTable">
+            <thead>
+              <tr>
+                <th>Phenotype Trait</th>
+                <th>Value</th>
+                <th>Units</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for row in matrix %}
+                <tr>
+                  <td class="center">{{ row.0 }}</td>
+                  <td class="center">{{ row.1 }}</td>
+                  <td class="center">{{ row.2 }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            
+            
+            
+            </tbody>
+          </table>
+          
+          <script>
+            $(document).ready(function() {
+              $('#myTable').DataTable();
+            });
+          </script>
+          
+
         <p>
             <!-- return no selectStudy-->
             <br>
