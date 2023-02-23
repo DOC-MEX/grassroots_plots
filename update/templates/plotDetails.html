@@ -68,9 +68,14 @@
           
           <script>
             $(document).ready(function() {
-              $('#myTable').DataTable();
+              $('#myTable').DataTable({
+                paging: false,
+                searchHighlight: true,
+                scrollX: true,
+              });
             });
           </script>
+          
           
 
         <p>
