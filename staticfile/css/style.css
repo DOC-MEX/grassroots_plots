@@ -1,0 +1,24 @@
+/* Styles for smaller screens */
+@media only screen and (max-width: 480px) {
+  #study {
+    font-size: 16px;
+    padding: 10px;
+    width: 100%;
+    max-width: 200px;
+  }
+  input[type="submit"] {
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+  table,
+  th,
+  td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+  }
+  table {
+    font-size: 14px;
+  }
+}
+
