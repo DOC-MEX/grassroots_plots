@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+
+        <!-- jQuery library -->
+	<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+
+	<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+
+        <!-- DataTables plugin JavaScript -->
+	<!-- <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script> -->
+	<script type="text/javascript" src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+
+        <!-- DataTables plugin CSS -->
+	<!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css"> -->   
+	<link rel="stylesheet" type="text/css" src="{% static 'css/jquery.dataTables.min.css' %}"></link>
+	
+	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"/>
+        <title>Plot Details</title>
+       <style>
+            table, th, td {
+              border: 1px solid black;
+              border-collapse: collapse;
+              text-align: center;
+            }
+        </style>     
+    </head>
+    <body>
+        
+        
+        <strong>{{ studyName }}</strong> 
+        <p>
+            plot {{plotIndex}}
+        </p>
+        <p>
+        Row: {{ row }},   column: {{ column }} <br>
+        Accession: {{ accession }} <br>
+        </p>
+                
+        
+        <p>
+        
+        
+            Current phenotypes used in study:
+            &nbsp
+           <!-- show values of traits in dropdown menu --> 
+           <select id="trait">
+               <option selected="selected" disabled="disabled">List of traits in study</option>
+               {% for key, value in traits.items %}
+                   <option value="{{ key }}">{{ value }}</option>
+               {% endfor %}
+           </select>           
+           </p>
+          
+          
+
+        <p>
+            <!-- return no selectStudy-->
+            <br>
+            <a href = "{% url 'updatePlot' study_id=studyID %}">Return study menu</a>  
+            </p>
+        
+        
+       
+
+       
+              
+       
+
+    </body>
+</html>

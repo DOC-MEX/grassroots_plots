@@ -89,16 +89,120 @@ def updatePlot(request, study_id):    #plotData.html  second page
     
     if request.method == 'POST':
         selected_plot = request.POST.get('plot-select')
-        if selected_plot:
-            print("selected plot: ", selected_plot)
-            redirect_url = reverse('plotDetails', 
-                kwargs={'plot_id': selected_plot, 'study_id': study_id})
-            #return redirect('plotDetails', plot_id=selected_plot)
-            return redirect(redirect_url)
+        if request.POST.get('load-plot'):
+            if selected_plot:
+                print("selected plot: ", selected_plot)
+                redirect_url = reverse('plotDetails', 
+                    kwargs={'plot_id': selected_plot, 'study_id': study_id})
+            
+                return redirect(redirect_url)
+            else:
+            # Return the same template with the form
+                return render(request, 'plotData.html', {'studyID': study_id, 
+                    'studyName': studyName, 'plots':sortedPlots, 
+                    'traits':dictTraits, 'nPlots':nPlots })
+        
+        elif request.POST.get('update-details'):
+            if selected_plot:
+                redirect_url = reverse('updateDetails', 
+                    kwargs={'plot_id': selected_plot, 'study_id': study_id})
+            else:
+            # Return the same template with the form
+                return render(request, 'plotData.html', {'studyID': study_id, 
+                    'studyName': studyName, 'plots':sortedPlots, 
+                    'traits':dictTraits, 'nPlots':nPlots })    
+            
+            return redirect(redirect_url)    
     
     return render(request, 'plotData.html', {'studyID': study_id, 
         'studyName': studyName, 'plots':sortedPlots, 
         'traits':dictTraits, 'nPlots':nPlots })
+
+########################################################
+########################################################
+def updateDetails(request, plot_id, study_id):    # 3rd page. updateDetails.html
+    study = get_plot(study_id)
+    study = json.loads(study)
+    studyName = study['results'][0]['results'][0]['data']['so:name']
+
+    plots = study['results'][0]['results'][0]['data']['plots'] 
+    accession = None
+    phenotype = None
+
+
+    if  "phenotypes" in study['results'][0]['results'][0]['data']: 
+        phenotypes = study['results'][0]['results'][0]['data']['phenotypes']  # Details of all the phenotypes
+        dictTraits = dict_phenotypes(phenotypes, plots)  # dictionary to fill dropdown menu
+        default_name = list(dictTraits.keys())[0]            
+    else:
+        dictTraits = {'No Data':'No data'}  #
+        phenotypes = {'No Data': 'No Data'}  
+        #print(dictTraits)
+        default_name = list(dictTraits.keys())[0]   
+
+    rawValues = []
+    phenoVariables = [] 
+    traits     = []
+    units      = []
+    row     = []
+    column  = []
+    
+    for j in range(len(plots)):
+        if (plot_id in plots[j]['_id']['$oid']):  # FIND PLOT
+            if ('rows' in plots[j]):
+                plotIndex  = plots[j]['rows'][0]['study_index']
+                print("found plot ", plotIndex)
+                if ('material' in plots[j]['rows'][0]):
+                    accession = plots[j]['rows'][0]['material']['accession']
+                if ('observations' in plots[j]['rows'][0]):
+                    # Get data from particular plot. phenotypes and raw values
+                    for k in range(len(plots[j]['rows'][0]['observations'])):
+                        phenotype = plots[j]['rows'][0]['observations'][k]['phenotype']['variable']
+                        phenoVariables.append(phenotype)
+                        if ('raw_value' in plots[j]['rows'][0]['observations'][k]):
+                            raw_value = plots[j]['rows'][0]['observations'][k]['raw_value']
+                            rawValues.append(raw_value)
+                        if ('corrected_value' in plots[j]['rows'][0]['observations'][k]):
+                            raw_value = plots[j]['rows'][0]['observations'][k]['corrected_value']
+                            rawValues.append(raw_value)
+
+                        #print("phenotype: ", phenotype, raw_value)
+                        
+            row    = plots[j]['row_index'] 
+            column = plots[j]['column_index'] 
+
+            if accession == None:                
+                accession = 'No accession'
+
+    if  "phenotypes" in study['results'][0]['results'][0]['data']: 
+        phenotypes = study['results'][0]['results'][0]['data']['phenotypes']  # Details of all the phenotypes
+    else:
+        phenotypes = {'No Data': 'No Data'}  
+    
+    # Get trait data from each phenotype in current plot
+    for i in range(len(phenoVariables)): 
+        trait, unit = get_trait(phenoVariables[i], phenotypes)
+        traits.append(trait)
+        units.append(unit)
+
+        #print(rawValues)
+        #print(units)
+        matrix=[rawValues, traits]
+        matrix=list(zip(traits, rawValues, units))
+
+    if len(phenoVariables)==0:
+        matrix = None
+        rawValues = None
+        traits = None
+        units = None
+    
+    
+
+    return render(request, 'updateDetails.html', {'plotID': plot_id, 'studyID': study_id,
+        'studyName': studyName, 'row':row, 'column':column, 'accession':accession,
+        'plotIndex':plotIndex, 'matrix':matrix,  
+        'rawValues':rawValues, 'traits':traits, 'traits':dictTraits})
+
 ########################################################
 ########################################################
 def plotDetails(request, plot_id, study_id):    # thirs page. plotDetails.html
@@ -114,6 +218,8 @@ def plotDetails(request, plot_id, study_id):    # thirs page. plotDetails.html
     phenoVariables = [] 
     traits     = []
     units      = []
+    row  = []
+    column  = []
     for j in range(len(plots)):
         if (plot_id in plots[j]['_id']['$oid']):  # FIND PLOT
             if ('rows' in plots[j]):
