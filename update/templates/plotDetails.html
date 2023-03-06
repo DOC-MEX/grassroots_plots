@@ -45,8 +45,9 @@
         <table id="myTable">
             <thead>
               <tr>
+                
                 <th>Phenotype Trait</th>
-                <th>Value</th>
+                <th>Measurement value (Date)</th>
                 <th>Units</th>
               </tr>
             </thead>
@@ -61,16 +62,17 @@
               </tbody>
             </table>
             
-            
-            
             </tbody>
           </table>
+
+          
           
           <script>
             $(document).ready(function() {
               $('#myTable').DataTable({
-                paging: false,
-                searchHighlight: true,
+                searhHighlight: true,
+                paging: false,                
+                searching: true,
                 scrollX: true,
               });
             });

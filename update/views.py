@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django import template
 import operator
 import json
+from datetime import datetime
 
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -184,9 +185,7 @@ def updateDetails(request, plot_id, study_id):    # 3rd page. updateDetails.html
         trait, unit = get_trait(phenoVariables[i], phenotypes)
         traits.append(trait)
         units.append(unit)
-
-        #print(rawValues)
-        #print(units)
+        
         matrix=[rawValues, traits]
         matrix=list(zip(traits, rawValues, units))
 
@@ -195,6 +194,17 @@ def updateDetails(request, plot_id, study_id):    # 3rd page. updateDetails.html
         rawValues = None
         traits = None
         units = None
+
+
+        if request.method == 'POST':
+            my_input_value = request.POST.get('my-input')
+            selected_trait_value = request.POST.get('selected-trait')
+            print(f"My input value is: {my_input_value}")
+            print(f"Selected trait value is: {selected_trait_value}")
+            return render(request, 'updateDetails.html', {'plotID': plot_id, 'studyID': study_id,
+                'studyName': studyName, 'row':row, 'column':column, 'accession':accession,
+                'plotIndex':plotIndex, 'matrix':matrix,  
+                'rawValues':rawValues, 'traits':traits, 'traits':dictTraits})
     
     
 
@@ -205,7 +215,7 @@ def updateDetails(request, plot_id, study_id):    # 3rd page. updateDetails.html
 
 ########################################################
 ########################################################
-def plotDetails(request, plot_id, study_id):    # thirs page. plotDetails.html
+def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
     study = get_plot(study_id)
     study = json.loads(study)
     studyName = study['results'][0]['results'][0]['data']['so:name']
@@ -218,8 +228,10 @@ def plotDetails(request, plot_id, study_id):    # thirs page. plotDetails.html
     phenoVariables = [] 
     traits     = []
     units      = []
-    row  = []
-    column  = []
+    row     = None
+    column  = None
+    dates   = []
+
     for j in range(len(plots)):
         if (plot_id in plots[j]['_id']['$oid']):  # FIND PLOT
             if ('rows' in plots[j]):
@@ -235,11 +247,27 @@ def plotDetails(request, plot_id, study_id):    # thirs page. plotDetails.html
                         if ('raw_value' in plots[j]['rows'][0]['observations'][k]):
                             raw_value = plots[j]['rows'][0]['observations'][k]['raw_value']
                             rawValues.append(raw_value)
-                        if ('corrected_value' in plots[j]['rows'][0]['observations'][k]):
+                            if ('date' in plots[j]['rows'][0]['observations'][k]):    
+                                date = plots[j]['rows'][0]['observations'][k]['date']
+                                date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
+                                date_only = date.strftime('%Y-%m-%d')
+                                dates.append(date_only)
+                            else:
+                                dates.append('')  
+                            
+                            
+                        elif ('corrected_value' in plots[j]['rows'][0]['observations'][k]):
                             raw_value = plots[j]['rows'][0]['observations'][k]['corrected_value']
                             rawValues.append(raw_value)
+                            if ('date' in plots[j]['rows'][0]['observations'][k]):    
+                                date = plots[j]['rows'][0]['observations'][k]['date']
+                                date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
+                                date_only = date.strftime('%Y-%m-%d')
+                                dates.append(date_only)
+                            else:
+                                dates.append('')                          
 
-                        #print("phenotype: ", phenotype, raw_value)
+                        #print("dates: ", len(rawValues),len(dates))
                         
             row    = plots[j]['row_index'] 
             column = plots[j]['column_index'] 
@@ -252,16 +280,19 @@ def plotDetails(request, plot_id, study_id):    # thirs page. plotDetails.html
     else:
         phenotypes = {'No Data': 'No Data'}  
     
-    # Get trait data from each phenotype in current plot
+    # Get trait and unit data from each phenotype in current plot
     for i in range(len(phenoVariables)): 
         trait, unit = get_trait(phenoVariables[i], phenotypes)
         traits.append(trait)
         units.append(unit)
-
         #print(rawValues)
         #print(units)
-        matrix=[rawValues, traits]
-        matrix=list(zip(traits, rawValues, units))
+
+    #combined = [f'{rawValue} ({date})' for rawValue, date in zip(rawValues, dates)]
+    combined = [f'{rawValue} ({date})' if date else str(rawValue) for rawValue, date in zip(rawValues, dates)]
+    
+    matrix=[rawValues, traits]
+    matrix=list(zip(traits, combined, units))
 
     if len(phenoVariables)==0:
         matrix = None
@@ -274,4 +305,4 @@ def plotDetails(request, plot_id, study_id):    # thirs page. plotDetails.html
     return render(request, 'plotDetails.html', {'plotID': plot_id, 'studyID': study_id,
         'studyName': studyName, 'row':row, 'column':column, 'accession':accession,
         'plotIndex':plotIndex, 'matrix':matrix,  
-        'rawValues':rawValues, 'traits':traits, 'iterator':range(1,2)})
+        'rawValues':rawValues, 'traits':traits, 'dates':dates})

@@ -10,19 +10,8 @@
     <body>
         <strong>{{ studyName }}</strong> 
         <p>
-        
-        
-         Current phenotypes used in study:
-         &nbsp
-        <!-- show values of traits in dropdown menu --> 
-        <select id="trait">
-            <option selected="selected" disabled="disabled">List of traits in study</option>
-            {% for key, value in traits.items %}
-                <option value="{{ key }}">{{ value }}</option>
-            {% endfor %}
-        </select>           
+        Total number of plots: {{ nPlots }}.
         </p>
-        Total number of plots: {{ nPlots }}. &nbsp &nbsp &nbsp
         <p>
            <b> Select plot to update: </b>
             <form id="plot-form" action="" method="post">

@@ -45,18 +45,61 @@
         <p>
         
         
-            Current phenotypes used in study:
+            Select phenotype to update:
             &nbsp
            <!-- show values of traits in dropdown menu --> 
-           <select id="trait">
-               <option selected="selected" disabled="disabled">List of traits in study</option>
-               {% for key, value in traits.items %}
-                   <option value="{{ key }}">{{ value }}</option>
-               {% endfor %}
-           </select>           
-           </p>
+           <form id="updateForm" method="post">
+            {% csrf_token %}            
+            <br>
+            <select id="trait" name="selected-trait">
+                <option selected="selected" disabled="disabled">List of traits in study</option>
+                {% for key, value in traits.items %}
+                    <option value="{{ key }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+
+            <br>
+            <label for="my-input">new measurement:</label>
+            <input type="number" name="my-input" id="my-input" required>
+            <br>
+
+            <input type="submit" value="Submit">
+        </form>
+        </p>
+
+        <div id="message"></div>
+
+<script>
+    const form = document.querySelector('#updateForm');
+    const message = document.querySelector('#message');
+    
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const myInputValue = document.querySelector('#my-input').value;
+        const selectedTraitValue = document.querySelector('#trait').value;
+        console.log(`My input value is: ${myInputValue}`);
+        console.log(`Selected trait value is: ${selectedTraitValue}`);
+        // Process the values as needed
+        // ...
+        // Display a success message
+        message.textContent = `Form submitted successfully with value ${myInputValue}`;
+        message.style.display = 'block';
+        form.reset();
+    });
+</script>
+
+<style>
+    #message {
+        display: none;
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #dff0d8;
+        border: 1px solid #c8e5bc;
+        border-radius: 4px;
+    }
+</style>
           
-          
+           
 
         <p>
             <!-- return no selectStudy-->
