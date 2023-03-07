@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django import template
 import operator
 import json
-from datetime import datetime
+from datetime import datetime, date
 
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -196,12 +196,18 @@ def updateDetails(request, plot_id, study_id):    # 3rd page. updateDetails.html
         units = None
 
 
-        if request.method == 'POST':
-            my_input_value = request.POST.get('my-input')
-            selected_trait_value = request.POST.get('selected-trait')
-            print(f"My input value is: {my_input_value}")
-            print(f"Selected trait value is: {selected_trait_value}")
-            return render(request, 'updateDetails.html', {'plotID': plot_id, 'studyID': study_id,
+    if request.method == 'POST':
+        print(request.POST)
+        my_input_value = request.POST.get('my-input')
+        selected_phenotype = request.POST.get('selected-trait')
+        selected_date = request.POST.get('my-date')
+        if len(selected_date) == 0:
+             selected_date = str(date.today().strftime('%Y-%m-%d'))
+        print(f"New observation is: {my_input_value}")
+        print(selected_phenotype)
+        print(selected_date)
+
+        return render(request, 'updateDetails.html', {'plotID': plot_id, 'studyID': study_id,
                 'studyName': studyName, 'row':row, 'column':column, 'accession':accession,
                 'plotIndex':plotIndex, 'matrix':matrix,  
                 'rawValues':rawValues, 'traits':traits, 'traits':dictTraits})

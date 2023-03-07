@@ -44,49 +44,70 @@
         
         <p>
         
-        
-            Select phenotype to update:
-            &nbsp
+            
+            
            <!-- show values of traits in dropdown menu --> 
            <form id="updateForm" method="post">
             {% csrf_token %}            
-            <br>
+            <p>
+            Select phenotype:     &nbsp
             <select id="trait" name="selected-trait">
                 <option selected="selected" disabled="disabled">List of traits in study</option>
                 {% for key, value in traits.items %}
                     <option value="{{ key }}">{{ value }}</option>
                 {% endfor %}
             </select>
-
+            </p>
             <br>
-            <label for="my-input">new measurement:</label>
+            <label for="my-input">Add measurement:</label>
             <input type="number" name="my-input" id="my-input" required>
             <br>
-
-            <input type="submit" value="Submit">
+            <p>
+            <label for="my-date">Select a date:  &nbsp</label>
+            <input type="date" name="my-date" id="my-date">    
+            </p>
+            <input type="submit" value="Submit observation">
+            <br>
         </form>
         </p>
 
         <div id="message"></div>
 
-<script>
-    const form = document.querySelector('#updateForm');
-    const message = document.querySelector('#message');
-    
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const myInputValue = document.querySelector('#my-input').value;
-        const selectedTraitValue = document.querySelector('#trait').value;
-        console.log(`My input value is: ${myInputValue}`);
-        console.log(`Selected trait value is: ${selectedTraitValue}`);
-        // Process the values as needed
-        // ...
-        // Display a success message
-        message.textContent = `Form submitted successfully with value ${myInputValue}`;
-        message.style.display = 'block';
-        form.reset();
-    });
-</script>
+        <script>
+            const form = document.querySelector('#updateForm');
+            const message = document.querySelector('#message');
+            
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const myInputValue = document.querySelector('#my-input').value;
+                const selectedTraitValue = document.querySelector('#trait').value;
+                console.log(`My input value is: ${myInputValue}`);
+                console.log(`Selected trait value is: ${selectedTraitValue}`);
+                // Process the values as needed
+                // ...
+                // Send the form data to the server
+                fetch('', {
+                    method: form.method,
+                    body: new FormData(form),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Display a success message
+                        message.textContent = `Form submitted successfully with value ${myInputValue}`;
+                        message.style.display = 'block';
+                        form.reset();
+                    } else {
+                        throw new Error('An error occurred while submitting the form.');
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    message.textContent = 'An error occurred while submitting the form.';
+                    message.style.display = 'block';
+                });
+            });
+        </script>
+        
 
 <style>
     #message {
