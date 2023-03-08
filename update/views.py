@@ -92,7 +92,7 @@ def updatePlot(request, study_id):    #plotData.html  second page
             # Return the same template with the form
                 return render(request, 'plotData.html', {'studyID': study_id, 
                     'studyName': studyName, 'plots':sortedPlots, 
-                    'traits':dictTraits, 'nPlots':nPlots })
+                     'nPlots':nPlots })
         
         elif request.POST.get('update-details'):
             if selected_plot:
@@ -102,7 +102,7 @@ def updatePlot(request, study_id):    #plotData.html  second page
             # Return the same template with the form
                 return render(request, 'plotData.html', {'studyID': study_id, 
                     'studyName': studyName, 'plots':sortedPlots, 
-                    'traits':dictTraits, 'nPlots':nPlots })    
+                     'nPlots':nPlots })    
             
             return redirect(redirect_url)    
     
