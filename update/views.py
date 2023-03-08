@@ -57,16 +57,7 @@ def updatePlot(request, study_id):    #plotData.html  second page
 
     plots = study['results'][0]['results'][0]['data']['plots']       # send only array of 'plots' to plotly
 
-    if  "phenotypes" in study['results'][0]['results'][0]['data']: 
-        phenotypes = study['results'][0]['results'][0]['data']['phenotypes']  # Details of all the phenotypes
-        dictTraits = dict_phenotypes(phenotypes, plots)  # dictionary to fill dropdown menu
-        default_name = list(dictTraits.keys())[0]            
-        #print(default_name, list(dictTraits.values())[0])
-    else:
-        dictTraits = {'No Data':'No data'}  #
-        phenotypes = {'No Data': 'No Data'}  
-        #print(dictTraits)
-        default_name = list(dictTraits.keys())[0]        
+    
 
     plotIndices = []
     plotIDs      = []
@@ -77,7 +68,7 @@ def updatePlot(request, study_id):    #plotData.html  second page
             pass
         
         if ('rows' in plots[j]):
-            plotIndex  = plots[j]['rows'][0]['study_index']
+            plotIndex  = plots[j]['rows'][0]['study_index']            
             plotIndices.append(plotIndex)
             plot_ID = plots[j]['_id']['$oid']
             plotIDs.append(plot_ID)
@@ -117,7 +108,7 @@ def updatePlot(request, study_id):    #plotData.html  second page
     
     return render(request, 'plotData.html', {'studyID': study_id, 
         'studyName': studyName, 'plots':sortedPlots, 
-        'traits':dictTraits, 'nPlots':nPlots })
+         'nPlots':nPlots })
 
 ########################################################
 ########################################################
@@ -196,15 +187,13 @@ def updateDetails(request, plot_id, study_id):    # 3rd page. updateDetails.html
         units = None
 
 
-    if request.method == 'POST':
-        print(request.POST)
+    if request.method == 'POST':        
         my_input_value = request.POST.get('my-input')
         selected_phenotype = request.POST.get('selected-trait')
         selected_date = request.POST.get('my-date')
         if len(selected_date) == 0:
              selected_date = str(date.today().strftime('%Y-%m-%d'))
-        print(f"New observation is: {my_input_value}")
-        print(selected_phenotype)
+        print(f"New observation is: {my_input_value} for {selected_phenotype}")        
         print(selected_date)
 
         return render(request, 'updateDetails.html', {'plotID': plot_id, 'studyID': study_id,

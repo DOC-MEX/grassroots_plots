@@ -51,7 +51,7 @@
             {% csrf_token %}            
             <p>
             Select phenotype:     &nbsp
-            <select id="trait" name="selected-trait">
+            <select id="trait" name="selected-trait" required>
                 <option selected="selected" disabled="disabled">List of traits in study</option>
                 {% for key, value in traits.items %}
                     <option value="{{ key }}">{{ value }}</option>
@@ -64,49 +64,71 @@
             <br>
             <p>
             <label for="my-date">Select a date:  &nbsp</label>
-            <input type="date" name="my-date" id="my-date">    
+            <input type="date" name="my-date" id="my-date">    &nbsp (If not selected, today's date will be used).
             </p>
-            <input type="submit" value="Submit observation">
+            <input type="submit" value="Submit observation" onclick="validateForm(event)">
             <br>
         </form>
         </p>
 
         <div id="message"></div>
 
+        
         <script>
-            const form = document.querySelector('#updateForm');
-            const message = document.querySelector('#message');
-            
-            form.addEventListener('submit', (event) => {
-                event.preventDefault();
-                const myInputValue = document.querySelector('#my-input').value;
-                const selectedTraitValue = document.querySelector('#trait').value;
-                console.log(`My input value is: ${myInputValue}`);
-                console.log(`Selected trait value is: ${selectedTraitValue}`);
-                // Process the values as needed
-                // ...
-                // Send the form data to the server
-                fetch('', {
-                    method: form.method,
-                    body: new FormData(form),
+            const form = document.querySelector("#updateForm");
+            const message = document.querySelector("#message");
+          
+            // Validate the form before submitting
+            const validateForm = () => {
+              const traitValue = document.querySelector("#trait").value;
+              const inputValue = document.querySelector("#my-input").value;
+              const dateValue = document.querySelector("#my-date").value;
+              
+              if (traitValue==='List of traits in study') {
+                alert("Please select a phenotype");
+                return false;
+              }
+              return true;
+            };
+          
+            form.addEventListener("submit", (event) => {
+              event.preventDefault();
+          
+              if (!validateForm()) {
+                return;
+              }
+          
+              const myInputValue = document.querySelector("#my-input").value;
+              const selectedTraitValue = document.querySelector("#trait").value;
+              console.log(`My input value is: ${myInputValue}`);
+              console.log(`Selected trait value is: ${selectedTraitValue}`);
+          
+              // Process the values as needed
+              // ...
+          
+              // Send the form data to the server
+              fetch("", {
+                method: form.method,
+                body: new FormData(form),
+              })
+                .then((response) => {
+                  if (response.ok) {
+                    // Display a success message
+                    message.textContent = `Form submitted for ${selectedTraitValue} with value ${myInputValue}`;
+                    message.style.display = "block";
+                    form.reset();
+                  } else {
+                    throw new Error("An error occurred while submitting the form.");
+                  }
                 })
-                .then(response => {
-                    if (response.ok) {
-                        // Display a success message
-                        message.textContent = `Form submitted successfully with value ${myInputValue}`;
-                        message.style.display = 'block';
-                        form.reset();
-                    } else {
-                        throw new Error('An error occurred while submitting the form.');
-                    }
-                })
-                .catch(error => {
-                    console.error(error);
-                    message.textContent = 'An error occurred while submitting the form.';
-                    message.style.display = 'block';
+                .catch((error) => {
+                  console.error(error);
+                  message.textContent = "An error occurred while submitting the form.";
+                  message.style.display = "block";
                 });
             });
-        </script>
+          </script>
+          
         
 
 <style>
