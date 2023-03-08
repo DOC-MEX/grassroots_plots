@@ -61,17 +61,17 @@ def updatePlot(request, study_id):    #plotData.html  second page
 
     plotIndices = []
     plotIDs      = []
-    for j in range(len(plots)):
-        if ( 'discard' in plots[j]['rows'][0] ):
-            pass
-        if ( 'blank' in plots[j]['rows'][0] ):
-            pass
-        
+    for j in range(len(plots)):                
         if ('rows' in plots[j]):
-            plotIndex  = plots[j]['rows'][0]['study_index']            
-            plotIndices.append(plotIndex)
-            plot_ID = plots[j]['_id']['$oid']
-            plotIDs.append(plot_ID)
+            if ( 'discard' in plots[j]['rows'][0] ):
+                pass
+            elif ( 'blank' in plots[j]['rows'][0] ):
+                pass
+            else:
+                plotIndex  = plots[j]['rows'][0]['study_index']            
+                plotIndices.append(plotIndex)
+                plot_ID = plots[j]['_id']['$oid']
+                plotIDs.append(plot_ID)
 
     plotsList    = dict(zip(plotIDs, plotIndices)) 
     # get number of elements in plotIndices
