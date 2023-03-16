@@ -1,6 +1,7 @@
 import requests
 import json
 from django.conf import settings
+import aiohttp
 
 server_url = 'https://grassroots.tools/public_backend'
 server_url = 'http://localhost:2000/grassroots/public_backend'
@@ -170,3 +171,39 @@ def get_plot(id):
     res = requests.post(server_url, data=json.dumps(plot_request))
     return json.dumps(res.json())
 
+################not needed as request is perform by Javascript###
+async def updateRequest(selected_phenotype, selected_date, observation):
+    amend_request = {
+        "services":
+            [{
+            "start_service":True,
+            "so:alternateName":"field_trial-submit_plots",
+            "parameter_set":{"level":"simple","parameters":
+                [{"param":"PL Upload","current_value":
+                [{
+                "Plot ID":"1",
+                "Row":"1",
+                "Column":"1",
+                "Rack":"1",
+                "Accession":
+                "Hylux",
+                "Hd_dto_day 2023-03-11":"3"}]},
+                {"param":"PL Study",
+                 "current_value":"63c7e48ca115ca392f4b6fd3"},
+        {"param":"PL Data delimiter","current_value":","},
+        {"param":"PL Amend","current_value":True},
+        {"param":"ST Num Replicates","current_value":None},
+        {"param":"ST Plot Width","current_value":None},
+        {"param":"ST Plot Length","current_value":None}
+        ]}}]}
+    
+    
+    res = await requests.post(server_url, data=json.dumps(amend_request))
+    return json.dumps(res.json())
+
+############################################
+def interact_backend(data):
+    
+    res = requests.post(server_url, data=data)
+    #print("res: ") 
+    return json.dumps(res.json())

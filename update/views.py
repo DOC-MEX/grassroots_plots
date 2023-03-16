@@ -5,11 +5,15 @@ import operator
 import json
 from datetime import datetime, date
 
+from django.http import HttpResponse
+from django.middleware.csrf import get_token
 from django.shortcuts import redirect
 from django.urls import reverse
 
 from .grassroots_fieldtrial_requests import get_all_fieldtrials
 from .grassroots_fieldtrial_requests import get_plot
+from .grassroots_fieldtrial_requests import updateRequest
+from .grassroots_fieldtrial_requests import interact_backend
 
 from .grassroots_plots import dict_phenotypes
 from .grassroots_plots import get_trait
@@ -186,7 +190,8 @@ def updateDetails(request, plot_id, study_id):    # 3rd page. updateDetails.html
         traits = None
         units = None
 
-
+    csrf_token = get_token(request)
+    #print("TOKEN", csrf_token)
     if request.method == 'POST':        
         my_input_value = request.POST.get('my-input')
         selected_phenotype = request.POST.get('selected-trait')
@@ -195,20 +200,27 @@ def updateDetails(request, plot_id, study_id):    # 3rd page. updateDetails.html
              selected_date = str(date.today().strftime('%Y-%m-%d'))
         print(f"New observation is: {my_input_value} for {selected_phenotype}")        
         print(selected_date)
+        #result = updateRequest(plot_id, study_id, selected_phenotype, my_input_value, selected_date)
 
         return render(request, 'updateDetails.html', {'plotID': plot_id, 'studyID': study_id,
                 'studyName': studyName, 'row':row, 'column':column, 'accession':accession,
-                'plotIndex':plotIndex, 'matrix':matrix,  
+                'plotIndex':plotIndex, 'matrix':matrix, 'csrf_token':csrf_token,  
                 'rawValues':rawValues, 'traits':traits, 'traits':dictTraits})
     
     
 
     return render(request, 'updateDetails.html', {'plotID': plot_id, 'studyID': study_id,
         'studyName': studyName, 'row':row, 'column':column, 'accession':accession,
-        'plotIndex':plotIndex, 'matrix':matrix,  
+        'plotIndex':plotIndex, 'matrix':matrix, 'csrf_token':csrf_token, 
         'rawValues':rawValues, 'traits':traits, 'traits':dictTraits})
 
 ########################################################
+def interact_with_apache(request):
+    data = request.body    
+    response_json = interact_backend(data)
+    return HttpResponse(response_json)
+
+
 ########################################################
 def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
     study = get_plot(study_id)
