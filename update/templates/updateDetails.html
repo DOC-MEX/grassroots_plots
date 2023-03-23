@@ -60,12 +60,19 @@
             </select>
             </p>
             <br>
-            <label for="my-input">Add measurement:</label>
-            <input type="number" name="my-input" id="my-input" required>
+              <label for="my-input">Add measurement:</label>
+              <input type="number" name="my-input" id="my-input" required>
             <br>
             <p>
-            <label for="my-date">Select a date:  &nbsp</label>
-            <input type="date" name="my-date" id="my-date">    &nbsp (If not selected, today's date will be used).
+              <label for="my-date">Select a date:  &nbsp</label>
+              <input type="date" name="my-date" id="my-date">    
+            </p>
+            <p>
+              (If not selected, today's date will be used).
+            </p>
+            <p>
+                <label for="extra-note">Optional note:</label>
+                <input type="text" name="extra-note" id="extra-note">                  
             </p>
             <input type="submit" value="Submit observation" onclick="validateForm(event)">
             <br>
@@ -114,6 +121,9 @@
               // Prepare the data to be sent to the server
               plotIndex = "{{plotIndex}}";
               studyID   = "{{studyID}}";
+              studyID   = "63bfce1a86ff5b59175e1d66";// STUDY 1 LIVE
+
+              studyID = "63c7e48ca115ca392f4b6fd33";
               rowValue  = "{{row}}";
               columnValue    = "{{column}}";
               accessionValue = "{{accession}}";
@@ -167,9 +177,15 @@
                   const statusText = jsonResponse.results[0].status_text;
                   const selectedTrait = document.querySelector("#trait").value;
                   const inputValue = document.querySelector("#my-input").value;
-                  const messageText = `Form submitted for ${selectedTrait} with value ${inputValue}. Status: ${statusText}`;
-                  message.textContent = messageText;
+                  const messageText = `Form submitted for ${selectedTrait} with value ${inputValue}. <br> Status: ${statusText}`;
+                  //message.textContent = messageText;
+                  message.innerHTML = messageText;
                   //message.textContent = statusText;
+                  if (statusText.toLowerCase() !== "succeeded") {
+                       message.style.backgroundColor = "red";
+                    } else {
+                        message.style.backgroundColor = "#dff0d8";
+                    }
                   message.style.display = "block";
                   form.reset();
                 },

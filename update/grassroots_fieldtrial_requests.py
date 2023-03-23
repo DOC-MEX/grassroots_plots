@@ -1,7 +1,7 @@
 import requests
 import json
 from django.conf import settings
-import aiohttp
+#import aiohttp
 
 server_url = 'https://grassroots.tools/public_backend'
 server_url = 'http://localhost:2000/grassroots/public_backend'
@@ -203,7 +203,8 @@ async def updateRequest(selected_phenotype, selected_date, observation):
 
 ############################################
 def interact_backend(data):
-    
+    #private_url = 'https://grassroots.tools/private_backend'  # for live server
+    #res = requests.post(private_url, data=data)               # for live server
     res = requests.post(server_url, data=data)
     #print("res: ") 
     return json.dumps(res.json())
