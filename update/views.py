@@ -258,7 +258,13 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
                                 date = plots[j]['rows'][0]['observations'][k]['date']
                                 date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
                                 date_only = date.strftime('%Y-%m-%d')
-                                dates.append(date_only)
+                                if('end_date' in plots[j]['rows'][0]['observations'][k]):
+                                    endDate = plots[j]['rows'][0]['observations'][k]['end_date']
+                                    endDate = datetime.strptime(endDate, '%Y-%m-%dT%H:%M:%S')
+                                    dates.append("From "+date_only+" to "+endDate.strftime('%Y-%m-%d'))
+                                else:
+                                    dates.append(date_only)   
+                            
                             else:
                                 dates.append('')  
                             
@@ -271,6 +277,12 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
                                 date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
                                 date_only = date.strftime('%Y-%m-%d')
                                 dates.append(date_only)
+                                if('end_date' in plots[j]['rows'][0]['observations'][k]):
+                                    endDate = plots[j]['rows'][0]['observations'][k]['end_date']
+                                    endDate = datetime.strptime(endDate, '%Y-%m-%dT%H:%M:%S')
+                                    dates.append("From "+date_only+" to "+endDate.strftime('%Y-%m-%d'))
+                                else:
+                                    dates.append(date_only)
                             else:
                                 dates.append('')                          
 
@@ -298,8 +310,7 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
     #combined = [f'{rawValue} ({date})' for rawValue, date in zip(rawValues, dates)]
     combined = [f'{rawValue} ({date})' if date else str(rawValue) for rawValue, date in zip(rawValues, dates)]
     
-    matrix=[rawValues, traits]
-    matrix=list(zip(traits, combined, units))
+    matrix=list(zip(traits, rawValues, units, dates))
 
     if len(phenoVariables)==0:
         matrix = None

@@ -71,6 +71,15 @@
               (If not selected, today's date will be used).
             </p>
             <p>
+            Add an end day if taking a multi-day measurement
+            </p>
+            <p>
+                <label for="end-date">Select a date:  &nbsp</label>
+                <input type="date" name="end-date" id="end-date">    
+            </p>
+  
+
+            <p>
                 <label for="extra-note">Optional note:</label>
                 <input type="text" name="extra-note" id="extra-note">                  
             </p>
@@ -90,7 +99,7 @@
             const validateForm = () => {
               const traitValue = document.querySelector("#trait").value;
               const inputValue = document.querySelector("#my-input").value;
-              const dateValue  = document.querySelector("#my-date").value;
+              const dateValue  = document.querySelector("#my-date").value;            
           
               if (traitValue === "List of traits in study") {
                 alert("Please select a phenotype");
@@ -114,20 +123,23 @@
               const inputValue = document.querySelector("#my-input").value;
               const traitValue = document.querySelector("#trait").value;
               const dateValue  = document.querySelector("#my-date").value;
+              const endDate    = document.querySelector("#end-date").value;
               console.log(`My input value is: ${inputValue}`);
               console.log(`Selected trait value is: ${traitValue}`);
-              console.log(`DATE is: ${dateValue}`);
+              console.log(`start date is: ${dateValue}`);
+              console.log(`END date is: ${endDate}`);
           
               // Prepare the data to be sent to the server
               plotIndex = "{{plotIndex}}";
               studyID   = "{{studyID}}";
-              studyID   = "63bfce1a86ff5b59175e1d66";// STUDY 1 LIVE
+              studyID   = "63bfce1a86ff5b59175e1d66";// STUDY 1 (LIVE TEST)
 
-              studyID = "63c7e48ca115ca392f4b6fd33";
+              //studyID = "63c7e48ca115ca392f4b6fd3"; // STUDY 2 (LOCAL TEST)
               rowValue  = "{{row}}";
               columnValue    = "{{column}}";
               accessionValue = "{{accession}}";
-              phenotype_date = "" + traitValue +" " + dateValue +"";
+              //phenotype_date = "" + traitValue +" " + dateValue +"";
+              phenotype_date = "" + traitValue +" " + dateValue + " " + endDate +"";
               observation = ""+ inputValue +"";
               
 
