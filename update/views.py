@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django import template
+from django.conf import settings
 import operator
-import json
+import json, os
 from datetime import datetime, date
 
 from django.http import HttpResponse
@@ -12,11 +13,13 @@ from django.urls import reverse
 
 from .grassroots_fieldtrial_requests import get_all_fieldtrials
 from .grassroots_fieldtrial_requests import get_plot
-from .grassroots_fieldtrial_requests import updateRequest
+#from .grassroots_fieldtrial_requests import updateRequest
 from .grassroots_fieldtrial_requests import interact_backend
 
 from .grassroots_plots import dict_phenotypes
 from .grassroots_plots import get_trait
+
+from .grassroots_csv import create_CSV
 
 # list all studies
 def selectStudy(request):
@@ -85,6 +88,7 @@ def updatePlot(request, study_id):    #plotData.html  second page
     
     if request.method == 'POST':
         selected_plot = request.POST.get('plot-select')
+        ###################################################       
         if request.POST.get('load-plot'):
             if selected_plot:
                 print("selected plot: ", selected_plot)
@@ -97,7 +101,7 @@ def updatePlot(request, study_id):    #plotData.html  second page
                 return render(request, 'plotData.html', {'studyID': study_id, 
                     'studyName': studyName, 'plots':sortedPlots, 
                      'nPlots':nPlots })
-        
+        ###################################################       
         elif request.POST.get('update-details'):
             if selected_plot:
                 redirect_url = reverse('updateDetails', 
@@ -109,6 +113,23 @@ def updatePlot(request, study_id):    #plotData.html  second page
                      'nPlots':nPlots })    
             
             return redirect(redirect_url)    
+        ###################################################       
+        elif request.POST.get('download-file'):
+            #if selected_plot:             
+                print("create csv of study:", studyName)
+                phenotypes        = study['results'][0]['results'][0]['data']['phenotypes']
+                treatment_factors = study['results'][0]['results'][0]['data']['treatment_factors']
+                file_name = f"data-{study_id}.csv"
+                file_path = os.path.join(settings.BASE_DIR, 'CSVs', file_name)
+                create_CSV(plots, phenotypes, treatment_factors, study_id)                
+                # Open the file and read its contents into the HttpResponse object
+                with open(file_path, 'rb') as csv_file:
+                    response = HttpResponse(csv_file.read(), content_type='text/csv')
+                    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+                
+                return response
+            
+    
     
     return render(request, 'plotData.html', {'studyID': study_id, 
         'studyName': studyName, 'plots':sortedPlots, 
