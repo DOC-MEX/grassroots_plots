@@ -61,7 +61,7 @@
             </p>
             <br>
               <label for="my-input">Add measurement:</label>
-              <input type="number" name="my-input" id="my-input" required>
+              <input type="text" name="my-input" id="my-input" pattern="[0-9]+([.,][0-9]+)?" required>
             <br>
             <p>
               <label for="my-date">Select a date:  &nbsp</label>
@@ -149,7 +149,7 @@
                 [{"param":"PL Upload","current_value":
                 [{"Plot ID":plotIndex,"Row": rowValue,"Column":columnValue,
                 "Rack":"1","Accession":accessionValue, [phenotype_date]:observation}]},
-                {"param":"PL Study","current_value":studyID},
+                {"param":"PL Study","current_value":studyID},                
                 {"param":"PL Data delimiter","current_value":","},
                 {"param":"PL Amend","current_value":true},
                 {"param":"ST Num Replicates","current_value":null},
@@ -157,6 +157,7 @@
                 {"param":"ST Plot Length","current_value":null}
                 ]}}]
               }
+             
               console.info(JSON.stringify(grassrootsRequest));
               //TEST DATA
               data={"services":[{"start_service":true,"so:alternateName":"field_trial-submit_plots","parameter_set":{"level":"simple","parameters":
