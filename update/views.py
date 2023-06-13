@@ -77,7 +77,10 @@ def updatePlot(request, study_id):    #plotData.html  second page
             else:
                 plotIndex  = plots[j]['rows'][0]['study_index']            
                 plotIndices.append(plotIndex)
-                plot_ID = plots[j]['_id']['$oid']
+                plot_ID = plots[j]['_id']['$oid']  # plot ID, change to row ID!
+                rows_ID = plots[j]['rows'][0]['_id']['$oid']  # plot ID, change to row ID!
+                print("ID OF PLOT:",plot_ID, rows_ID)
+                plot_ID = rows_ID
                 plotIDs.append(plot_ID)
 
     plotsList    = dict(zip(plotIDs, plotIndices)) 
@@ -165,7 +168,8 @@ def updateDetails(request, plot_id, study_id):    # 3rd page. updateDetails.html
     column  = []
     
     for j in range(len(plots)):
-        if (plot_id in plots[j]['_id']['$oid']):  # FIND PLOT
+        ##if (plot_id in plots[j]['_id']['$oid']):  # FIND PLOT
+        if (plot_id in plots[j]['rows'][0]['_id']['$oid']):  # FIND ROW_ID INSTEAD?
             if ('rows' in plots[j]):
                 plotIndex  = plots[j]['rows'][0]['study_index']
                 print("found plot ", plotIndex)
@@ -261,7 +265,8 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
     dates   = []
 
     for j in range(len(plots)):
-        if (plot_id in plots[j]['_id']['$oid']):  # FIND PLOT
+        ##if (plot_id in plots[j]['_id']['$oid']):  # FIND PLOT
+        if (plot_id in plots[j]['rows'][0]['_id']['$oid']):  # FIND ROW_ID INSTEAD?
             if ('rows' in plots[j]):
                 plotIndex  = plots[j]['rows'][0]['study_index']
                 print("found plot ", plotIndex)

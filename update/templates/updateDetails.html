@@ -99,13 +99,14 @@
             const validateForm = () => {
               const traitValue = document.querySelector("#trait").value;
               const inputValue = document.querySelector("#my-input").value;
-              const dateValue  = document.querySelector("#my-date").value;            
+              const startDate  = document.querySelector("#my-date").value;
+              
           
               if (traitValue === "List of traits in study") {
                 alert("Please select a phenotype");
                 return false;
               }
-              if (!dateValue) {
+              if (!startDate) {
                 const currentDate = new Date().toISOString().slice(0, 10);
                 document.querySelector("#my-date").value = currentDate;
               }
@@ -122,58 +123,94 @@
           
               const inputValue = document.querySelector("#my-input").value;
               const traitValue = document.querySelector("#trait").value;
-              const dateValue  = document.querySelector("#my-date").value;
-              const endDate    = document.querySelector("#end-date").value;
+              const startDate  = document.querySelector("#my-date").value;
+              
+              const endDate    = document.querySelector("#end-date").value || null;
+              const end = endDate !== null ? JSON.stringify(endDate).slice(1, -1) : null;
+              const plotNote  = document.querySelector("#extra-note").value|| null;
+              const note = plotNote !== null ? JSON.stringify(plotNote).slice(1, -1) : null;
+
               console.log(`My input value is: ${inputValue}`);
               console.log(`Selected trait value is: ${traitValue}`);
-              console.log(`start date is: ${dateValue}`);
-              console.log(`END date is: ${endDate}`);
+              console.log(`start date is: ${startDate}`);
+              //console.log(`END date is: ${endDate}`);
+              //alert(`End date: ${end}`);
+              console.log(`optional Note: ${plotNote}`);
           
               // Prepare the data to be sent to the server
               plotIndex = "{{plotIndex}}";
               studyID   = "{{studyID}}";
+              plotID   = "{{plotID}}";
               studyID   = "63bfce1a86ff5b59175e1d66";// STUDY 1 (LIVE TEST)
 
-              //studyID = "63c7e48ca115ca392f4b6fd3"; // STUDY 2 (LOCAL TEST)
+              studyID = "63c7e48ca115ca392f4b6fd3"; // STUDY 2 (LOCAL TEST)
               rowValue  = "{{row}}";
               columnValue    = "{{column}}";
               accessionValue = "{{accession}}";
-              //phenotype_date = "" + traitValue +" " + dateValue +"";
-              phenotype_date = "" + traitValue +" " + dateValue + " " + endDate +"";
+              phenotype_name = "" + traitValue +"";
+              start = ""+ startDate +"";
+              //end   = ""+ endDate +"";
+              //note  = ""+ plotNote +"";
               observation = ""+ inputValue +"";
               
 
-              grassrootsRequest = {
-                "services":
-                [{"start_service":true,"so:alternateName":"field_trial-submit_plots","parameter_set":{"level":"simple","parameters":
-                [{"param":"PL Upload","current_value":
-                [{"Plot ID":plotIndex,"Row": rowValue,"Column":columnValue,
-                "Rack":"1","Accession":accessionValue, [phenotype_date]:observation}]},
-                {"param":"PL Study","current_value":studyID},                
-                {"param":"PL Data delimiter","current_value":","},
-                {"param":"PL Amend","current_value":true},
-                {"param":"ST Num Replicates","current_value":null},
-                {"param":"ST Plot Width","current_value":null},
-                {"param":"ST Plot Length","current_value":null}
-                ]}}]
+              //phenotype_date = "" + traitValue +" " + startDate + " " + endDate +""; // NOT NEEDED ANYMORE
+              //grassrootsRequest = {
+              //  "services":
+              //  [{"start_service":true,"so:alternateName":"field_trial-submit_plots","parameter_set":{"level":"simple","parameters":
+              //  [{"param":"PL Upload","current_value":
+              //  [{"Plot ID":plotIndex,"Row": rowValue,"Column":columnValue,
+              //  "Rack":"1","Accession":accessionValue, [phenotype_date]:observation}]},
+              //  {"param":"PL Study","current_value":studyID},                
+              //  {"param":"PL Data delimiter","current_value":","},
+              //  {"param":"PL Amend","current_value":true},
+              // {"param":"ST Num Replicates","current_value":null},
+              //  {"param":"ST Plot Width","current_value":null},
+              //  {"param":"ST Plot Length","current_value":null}
+              //  ]}}]
+              //}
+                           
+              grassrootsRequest={
+                "services": [{"so:name": "Edit Field Trial Rack","start_service": true,
+		"parameter_set": {"level": "simple",
+			"parameters": [{
+				"param": "RO Id","current_value": plotID,
+				"group": "Plot"
+			}, {
+				"param": "RO Append Observations",
+				"current_value": true,
+				"group": "Plot"
+			}, {
+				"param": "RO Measured Variable Name",
+				"current_value": [phenotype_name],
+				"group": "Phenotypes"
+			}, {
+				"param": "RO Phenotype Raw Value",
+				"current_value": [observation],
+				"group": "Phenotypes"
+			}, {
+				"param": "RO Phenotype Corrected Value",
+				"current_value": [null],
+				"group": "Phenotypes"
+			}, {
+				"param": "RO Phenotype Start Date",
+				"current_value": [start],
+				"group": "Phenotypes"
+			}, {
+				"param": "RO Phenotype End Date",
+				"current_value": [end],
+				"group": "Phenotypes"
+			}, {
+				"param": "RO Observation Notes",
+				"current_value": [note],
+				"group": "Phenotypes"
+			}]
+		}
+	}]
               }
-             
-              console.info(JSON.stringify(grassrootsRequest));
-              //TEST DATA
-              data={"services":[{"start_service":true,"so:alternateName":"field_trial-submit_plots","parameter_set":{"level":"simple","parameters":
-                [{"param":"PL Upload","current_value":
-                [{"Plot ID":"1","Row":"1","Column":"1","Rack":"1","Accession":"Hylux",
-                "Hd_dto_day 2023-03-08":"8"}]},
-                {"param":"PL Study","current_value":"63c7e48ca115ca392f4b6fd3"},
-                {"param":"PL Data delimiter","current_value":","},
-                {"param":"PL Amend","current_value":true},
-                {"param":"ST Num Replicates","current_value":null},
-                {"param":"ST Plot Width","current_value":null},
-                {"param":"ST Plot Length","current_value":null}
-                ]}}]}
 
-                //console.info(JSON.stringify(data));
-
+                console.log("end date, CHECK: ", end);
+                console.info(JSON.stringify(grassrootsRequest));
                 const csrftoken = '{{ csrf_token }}';
               // Send the form data to the server
               $.ajax({
