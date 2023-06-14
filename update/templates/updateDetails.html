@@ -90,6 +90,9 @@
 
         <div id="message"></div>
 
+        <p>
+        <button id="clearCacheButton">Updata observation table and return to plot selection menu</button>
+
         
         <script>
             const form = document.querySelector("#updateForm");
@@ -156,8 +159,8 @@
                            
               grassrootsRequest={
                 "services": [{"so:name": "Edit Field Trial Rack","start_service": true,
-		"parameter_set": {"level": "simple",
-			"parameters": [{
+		        "parameter_set": {"level": "simple",
+			    "parameters": [{
 				"param": "RO Id","current_value": plotID,
 				"group": "Plot"
 			}, {
@@ -188,9 +191,7 @@
 				"param": "RO Observation Notes",
 				"current_value": [note],
 				"group": "Phenotypes"
-			}]
-		}
-	}]
+			    }]}}]
               }
                 
                 console.info(JSON.stringify(grassrootsRequest));
@@ -229,10 +230,75 @@
                 },
               });
             });
+
+            // Retrieve CSRF token from a cookie
+            function getCookie(name) {
+                const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+                return cookieValue ? cookieValue.pop() : '';
+            }
+            const csrftoken = getCookie('csrftoken');
+
+           // BUTTON TO CLEAR CACHE
+            const clearCacheButton = document.getElementById('clearCacheButton');
+            clearCacheButton.addEventListener('click', function() {
+            clearCacheRequest = {services: [{start_service: true,
+                    'so:alternateName': 'field_trial-manage_study',
+                    parameter_set: {level: 'simple',
+                    parameters: [
+                    { param: 'ST Id', current_value: '63c7e48ca115ca392f4b6fd3' },
+                    { param: 'SM uuid', current_value: '63c7e48ca115ca392f4b6fd3' },
+                    { param: 'SM clear cached study', current_value: true },
+                    { param: 'SM indexer', current_value: '<NONE>' },
+                    { param: 'SM Delete study', current_value: false },
+                    { param: 'SM Remove Study Plots', current_value: false },
+                    { param: 'SM Generate FD Packages', current_value: false },
+                    { param: 'SM Generate Handbook', current_value: false },
+                    { param: 'SM Generate Phenotypes', current_value: false }]}
+                    }]}
+
+            $.ajax({
+            url: '/' + 'ajax/interact_backend/',
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: JSON.stringify(clearCacheRequest),
+            contentType: 'application/json',
+            success: function(result) {
+                const jsonResponse = JSON.parse(result);
+                const statusText = jsonResponse.results[0].status_text;            
+                const messageText = `Observations updated. <br> Status: ${statusText}`;
+
+            //const message = document.getElementById('message');
+                message.innerHTML = messageText;
+
+                if (statusText.toLowerCase() !== 'succeeded') {
+                    message.style.backgroundColor = 'red';
+                } else {
+                    message.style.backgroundColor = '#dff0d8';
+                }
+
+                message.style.display = 'block';
+                form.reset();
+
+                // Redirect to the same page
+                setTimeout(function() {
+                window.location.href = '{% url "updatePlot" study_id=studyID %}';
+                }, 1000);
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+                const message = document.getElementById('message');
+                message.textContent = 'An error occurred while updating the table.';
+                message.style.display = 'block';
+            }
+            });
+            });
+
+
           </script>
           
           
-        
 
 <style>
     #message {
@@ -245,19 +311,15 @@
     }
 </style>
           
-           
-
-        <p>
-            <!-- return no selectStudy-->
+          
+            <!-- return no selectStudy
+            <p>
             <br>
             <a href = "{% url 'updatePlot' study_id=studyID %}">Return study menu</a>  
             </p>
+        -->
         
         
-       
-
-       
-              
        
 
     </body>
