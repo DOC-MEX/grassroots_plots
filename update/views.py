@@ -77,9 +77,9 @@ def updatePlot(request, study_id):    #plotData.html  second page
             else:
                 plotIndex  = plots[j]['rows'][0]['study_index']            
                 plotIndices.append(plotIndex)
-                plot_ID = plots[j]['_id']['$oid']  # plot ID, change to row ID!
+                plot_ID = plots[j]['_id']['$oid']             # plot ID, change to row ID!
                 rows_ID = plots[j]['rows'][0]['_id']['$oid']  # plot ID, change to row ID!
-                print("ID OF PLOT:",plot_ID, rows_ID)
+                #print("ID OF PLOT:",plot_ID, rows_ID)
                 plot_ID = rows_ID
                 plotIDs.append(plot_ID)
 
@@ -263,6 +263,7 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
     row     = None
     column  = None
     dates   = []
+    notes   = []
 
     for j in range(len(plots)):
         ##if (plot_id in plots[j]['_id']['$oid']):  # FIND PLOT
@@ -277,6 +278,14 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
                     for k in range(len(plots[j]['rows'][0]['observations'])):
                         phenotype = plots[j]['rows'][0]['observations'][k]['phenotype']['variable']
                         phenoVariables.append(phenotype)
+
+                        if ('notes' in plots[j]['rows'][0]['observations'][k]):
+                            note = plots[j]['rows'][0]['observations'][k]['notes']
+                            notes.append(note)
+                        else:
+                            notes.append('')      # add empty note
+
+
                         if ('raw_value' in plots[j]['rows'][0]['observations'][k]):
                             raw_value = plots[j]['rows'][0]['observations'][k]['raw_value']
                             rawValues.append(raw_value)
@@ -313,6 +322,7 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
                                 dates.append('')                          
 
                         #print("dates: ", len(rawValues),len(dates))
+                        #print("NOTES: ", len(notes),len(notes))
                         
             row    = plots[j]['row_index'] 
             column = plots[j]['column_index'] 
@@ -336,7 +346,7 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
     #combined = [f'{rawValue} ({date})' for rawValue, date in zip(rawValues, dates)]
     combined = [f'{rawValue} ({date})' if date else str(rawValue) for rawValue, date in zip(rawValues, dates)]
     
-    matrix=list(zip(traits, rawValues, units, dates))
+    matrix=list(zip(traits, rawValues, units, dates, notes))
 
     if len(phenoVariables)==0:
         matrix = None

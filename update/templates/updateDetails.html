@@ -133,8 +133,7 @@
               console.log(`My input value is: ${inputValue}`);
               console.log(`Selected trait value is: ${traitValue}`);
               console.log(`start date is: ${startDate}`);
-              //console.log(`END date is: ${endDate}`);
-              //alert(`End date: ${end}`);
+              console.log(`end date is: ${endDate}`);              
               console.log(`optional Note: ${plotNote}`);
           
               // Prepare the data to be sent to the server
@@ -143,7 +142,7 @@
               plotID   = "{{plotID}}";
               studyID   = "63bfce1a86ff5b59175e1d66";// STUDY 1 (LIVE TEST)
 
-              studyID = "63c7e48ca115ca392f4b6fd3"; // STUDY 2 (LOCAL TEST)
+              //studyID = "63c7e48ca115ca392f4b6fd3"; // STUDY 2 (LOCAL TEST)
               rowValue  = "{{row}}";
               columnValue    = "{{column}}";
               accessionValue = "{{accession}}";
@@ -153,22 +152,7 @@
               //note  = ""+ plotNote +"";
               observation = ""+ inputValue +"";
               
-
-              //phenotype_date = "" + traitValue +" " + startDate + " " + endDate +""; // NOT NEEDED ANYMORE
-              //grassrootsRequest = {
-              //  "services":
-              //  [{"start_service":true,"so:alternateName":"field_trial-submit_plots","parameter_set":{"level":"simple","parameters":
-              //  [{"param":"PL Upload","current_value":
-              //  [{"Plot ID":plotIndex,"Row": rowValue,"Column":columnValue,
-              //  "Rack":"1","Accession":accessionValue, [phenotype_date]:observation}]},
-              //  {"param":"PL Study","current_value":studyID},                
-              //  {"param":"PL Data delimiter","current_value":","},
-              //  {"param":"PL Amend","current_value":true},
-              // {"param":"ST Num Replicates","current_value":null},
-              //  {"param":"ST Plot Width","current_value":null},
-              //  {"param":"ST Plot Length","current_value":null}
-              //  ]}}]
-              //}
+              //phenotype_date = "" + traitValue +" " + startDate + " " + endDate +""; // NOT NEEDED ANYMORE              
                            
               grassrootsRequest={
                 "services": [{"so:name": "Edit Field Trial Rack","start_service": true,
@@ -208,8 +192,7 @@
 		}
 	}]
               }
-
-                console.log("end date, CHECK: ", end);
+                
                 console.info(JSON.stringify(grassrootsRequest));
                 const csrftoken = '{{ csrf_token }}';
               // Send the form data to the server
