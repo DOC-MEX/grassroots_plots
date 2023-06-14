@@ -241,12 +241,13 @@
            // BUTTON TO CLEAR CACHE
             const clearCacheButton = document.getElementById('clearCacheButton');
             clearCacheButton.addEventListener('click', function() {
+                studyID   = "{{studyID}}";
             clearCacheRequest = {services: [{start_service: true,
                     'so:alternateName': 'field_trial-manage_study',
                     parameter_set: {level: 'simple',
                     parameters: [
-                    { param: 'ST Id', current_value: '63c7e48ca115ca392f4b6fd3' },
-                    { param: 'SM uuid', current_value: '63c7e48ca115ca392f4b6fd3' },
+                    { param: 'ST Id', current_value: studyID },
+                    { param: 'SM uuid', current_value: studyID },
                     { param: 'SM clear cached study', current_value: true },
                     { param: 'SM indexer', current_value: '<NONE>' },
                     { param: 'SM Delete study', current_value: false },
