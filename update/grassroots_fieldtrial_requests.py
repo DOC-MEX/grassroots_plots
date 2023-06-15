@@ -205,6 +205,15 @@ async def updateRequest(selected_phenotype, selected_date, observation):
 def interact_backend(data):
     #private_url = 'https://grassroots.tools/private_backend'  # for live server
     #res = requests.post(private_url, data=data)               # for live server
-    res = requests.post(server_url, data=data)
+    res = requests.post(server_url, data=data)  # for local(laptop) use server_url
+    #print("res: ") 
+    return json.dumps(res.json())
+
+
+############################################
+def interact_queen_server(data):
+    #queen_url = 'http://10.0.152.67/grassroots/queen_bee_backend'  # for live server
+    #res = requests.post(queen_url, data=data)               # for live server
+    res = requests.post(server_url, data=data)# for local(laptop) use server_url
     #print("res: ") 
     return json.dumps(res.json())

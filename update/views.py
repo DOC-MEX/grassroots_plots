@@ -15,6 +15,7 @@ from .grassroots_fieldtrial_requests import get_all_fieldtrials
 from .grassroots_fieldtrial_requests import get_plot
 #from .grassroots_fieldtrial_requests import updateRequest
 from .grassroots_fieldtrial_requests import interact_backend
+from .grassroots_fieldtrial_requests import interact_queen_server
 
 from .grassroots_plots import dict_phenotypes
 from .grassroots_plots import get_trait
@@ -245,6 +246,13 @@ def interact_with_apache(request):
     response_json = interact_backend(data)
     return HttpResponse(response_json)
 
+########################################################
+def interact_with_queen(request):
+    data = request.body    
+    response_json = interact_queen_server(data)
+    return HttpResponse(response_json)
+
+
 
 ########################################################
 def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
@@ -285,7 +293,6 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
                         else:
                             notes.append('')      # add empty note
 
-
                         if ('raw_value' in plots[j]['rows'][0]['observations'][k]):
                             raw_value = plots[j]['rows'][0]['observations'][k]['raw_value']
                             rawValues.append(raw_value)
@@ -302,8 +309,7 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
                             
                             else:
                                 dates.append('')  
-                            
-                            
+                                                        
                         elif ('corrected_value' in plots[j]['rows'][0]['observations'][k]):
                             raw_value = plots[j]['rows'][0]['observations'][k]['corrected_value']
                             rawValues.append(raw_value)
@@ -344,7 +350,7 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
         #print(units)
 
     #combined = [f'{rawValue} ({date})' for rawValue, date in zip(rawValues, dates)]
-    combined = [f'{rawValue} ({date})' if date else str(rawValue) for rawValue, date in zip(rawValues, dates)]
+    #combined = [f'{rawValue} ({date})' if date else str(rawValue) for rawValue, date in zip(rawValues, dates)]
     
     matrix=list(zip(traits, rawValues, units, dates, notes))
 
@@ -354,8 +360,6 @@ def plotDetails(request, plot_id, study_id):    # third page. plotDetails.html
         traits = None
         units = None
     
-    
-
     return render(request, 'plotDetails.html', {'plotID': plot_id, 'studyID': study_id,
         'studyName': studyName, 'row':row, 'column':column, 'accession':accession,
         'plotIndex':plotIndex, 'matrix':matrix,  
