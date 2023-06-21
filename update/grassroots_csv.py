@@ -60,7 +60,8 @@ def getRowCsv(row_json):
                                     only_date=None
                                 date = observations[j]['date'].split('T')[0]
                                 end_date = None
-                                if 'end_date' in (observations[i] and observations[j]):  # extra check
+                                if 'end_date' in (observations[j]): 
+                                  if 'end_date' in (observations[i]):   #extra check correction
                                     end_date = observations[j]['end_date'].split('T')[0]
                                     full_date = only_date + " " + end_date 
                                 if date==only_date:
@@ -117,7 +118,7 @@ def getRowCsv(row_json):
 
     raw_value.extend(mandatory)
     raw_value.extend(extra)
-
+    
     dict_row = dict(zip(phenotypeNames, raw_value))
     return dict_row
 
@@ -145,15 +146,16 @@ def create_CSV(plot_data, phenotypes, treatment_factors, plot_id):
                     if 'end_date' in observation:
                         end_date = observation['end_date'][:10]
                         dated_name = phenoname + " " + only_date + " " + end_date
-                    if phenoname in new_headers:                        
-                        index = new_headers.index(phenoname)
-                        new_headers[index] = dated_name                         
-                        phenoname = dated_name  ## not needed anymore?                        
+                    if phenoname in new_headers: 
+                        new_headers.append(dated_name) # append instead of replace
+                        #index = new_headers.index(phenoname)
+                        #new_headers[index] = dated_name 
+                        #phenoname = dated_name  ## not needed anymore?
                     elif dated_name not in new_headers:                        
                         new_headers.append(dated_name)
                         phenoname = dated_name
                         index = new_headers.index(phenoname)
-
+                
                 sample = observation['index'] #index always exists when no samples used and it is 1
                 # To check if current observation has sample on its name...
                 # ... you need to check if its next observation (if any) has a index>2                                
