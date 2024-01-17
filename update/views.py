@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django import template
 from django.conf import settings
 import operator
-import json, os
+import json, os, requests
 from datetime import datetime, date
 
 from django.http import HttpResponse
@@ -78,7 +78,7 @@ def updatePlot(request, study_id):    #plotData.html  second page
             else:
                 plotIndex  = plots[j]['rows'][0]['study_index']            
                 plotIndices.append(plotIndex)
-                plot_ID = plots[j]['_id']['$oid']             # plot ID, change to row ID!
+                plot_ID = plots[j]['_id']['$oid']             # plot ID, change to row ID!            
                 rows_ID = plots[j]['rows'][0]['_id']['$oid']  # plot ID, change to row ID!
                 #print("ID OF PLOT:",plot_ID, rows_ID)
                 plot_ID = rows_ID
@@ -88,6 +88,45 @@ def updatePlot(request, study_id):    #plotData.html  second page
     # get number of elements in plotIndices
     nPlots = len(plotIndices)
     sortedPlots = dict(sorted(plotsList.items(), key=operator.itemgetter(1)))
+
+    ########### API call to retrieve the limits file############
+        
+    # Directory for storing the limits file
+    limits_directory = os.path.join(settings.BASE_DIR, 'limits', study_id)
+    os.makedirs(limits_directory, exist_ok=True)  # Create directory if it doesn't exist
+
+    # Filename for the limits file
+    file_path = os.path.join(limits_directory, 'limits.json')
+
+    # API call to retrieve the limits file
+    try:
+        api_url = f'https://grassroots.tools/photo_receiver/retrieve_limits/{study_id}/'
+        response = requests.get(api_url)    
+        
+        print (response)        
+
+        if response.status_code == 200:
+            # Save the file
+            with open(file_path, 'wb') as file:
+                file.write(response.content)
+        else:
+            # Handle HTTP error (e.g., file not found, server error)
+            pass
+
+    except requests.exceptions.RequestException:
+        # Handle exceptions for network issues, timeout, etc.
+        # Log the error and continue with the rest of the view's functionality
+        pass
+
+    # Check if limits.json exists and read the data
+    plant_height_limits = None
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as file:
+            limits = json.load(file)
+            plant_height_limits = limits.get('Plant height', None) # search in dictionary for the key 'Plant height'
+            print(plant_height_limits)
+    
+    #################### End of API call ######################################## 
     
     
     if request.method == 'POST':
@@ -104,7 +143,7 @@ def updatePlot(request, study_id):    #plotData.html  second page
             # Return the same template with the form
                 return render(request, 'plotData.html', {'studyID': study_id, 
                     'studyName': studyName, 'plots':sortedPlots, 
-                     'nPlots':nPlots })
+                     'nPlots':nPlots, 'plant_height_limits':plant_height_limits })
         ###################################################       
         elif request.POST.get('update-details'):
             if selected_plot:
@@ -114,7 +153,7 @@ def updatePlot(request, study_id):    #plotData.html  second page
             # Return the same template with the form
                 return render(request, 'plotData.html', {'studyID': study_id, 
                     'studyName': studyName, 'plots':sortedPlots, 
-                     'nPlots':nPlots })    
+                     'nPlots':nPlots, 'plant_height_limits':plant_height_limits })    
             
             return redirect(redirect_url)    
         ###################################################       
@@ -137,7 +176,7 @@ def updatePlot(request, study_id):    #plotData.html  second page
     
     return render(request, 'plotData.html', {'studyID': study_id, 
         'studyName': studyName, 'plots':sortedPlots, 
-         'nPlots':nPlots })
+         'nPlots':nPlots, 'plant_height_limits':plant_height_limits })
 
 ########################################################
 ########################################################
@@ -215,6 +254,9 @@ def updateDetails(request, plot_id, study_id):    # 3rd page. updateDetails.html
         rawValues = None
         traits = None
         units = None
+
+    #print("TRAITS!",traits)
+    #print("dict tratis!",dictTraits)
 
     csrf_token = get_token(request)
     #print("TOKEN", csrf_token)

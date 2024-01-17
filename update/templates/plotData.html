@@ -31,6 +31,15 @@
                 <input type="submit" name="download-file" value="Download Study Data as CSV File" />
             
         </p>
+    
+    
+    {% if plant_height_limits %}
+    <p>
+        <p>Current limit for Plant height</p>
+        <p>Max: {{ plant_height_limits.max }}</p>
+        <p>Min: {{ plant_height_limits.min }}</p>
+    </p>    
+    {% endif %}
 
         <p>
         <!-- return no selectStudy-->
