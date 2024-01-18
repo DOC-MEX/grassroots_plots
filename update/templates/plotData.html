@@ -1,51 +1,145 @@
 <!DOCTYPE html>
 <html>
     <head>
-	{% load static %}
+        {% load static %}
         <meta charset="utf-8" />
         <title>Plot update</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+        <!-- Your existing CSS file -->
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+        <!-- jQuery for Bootstrap -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"/>
     </head>
     <body>
         <strong>{{ studyName }}</strong> 
         <p>
-        Total number of plots: {{ nPlots }}.
+            Total number of plots: {{ nPlots }}.
         </p>
-        <p>
-           <b> Select plot to update: </b>
-            <form id="plot-form" action="" method="post">
-                {% csrf_token %}
+        <form id="plot-form" action="" method="post">
+            {% csrf_token %}
+            <p>
+                <b> Select plot to update: </b>
                 <select name="plot-select" id="plot">
                     <option selected="selected" disabled="disabled">Select plot ID</option>
                     {% for key, value in plots.items %}
                         <option value="{{ key }}">{{ value }}</option>
                     {% endfor %}
                 </select>
-                <br>
-                <br>
+                <br><br>
                 <input type="submit" name="load-plot" value="Load Plot" />
                 <input type="submit" name="update-details" value="Update Details" />
-                <br>
-                <br>
+                <br><br>
                 <input type="submit" name="download-file" value="Download Study Data as CSV File" />
-            
-        </p>
+            </p>
+        </form>
     
-    
+        
     {% if plant_height_limits %}
-    <p>
-        <p>Current limit for Plant height</p>
-        <p>Max: {{ plant_height_limits.max }}</p>
-        <p>Min: {{ plant_height_limits.min }}</p>
-    </p>    
+    <p>Set validation limits for Plant Height (cm) for observation submitted with the mobile app </p>        
+        <p>Current Min: {{ plant_height_limits.min }}</p>
+        <p>Current Max: {{ plant_height_limits.max }}</p>
+    {% else %}
+       Set validation limits for Plant Height (cm) for observation submitted with the mobile app </p>
     {% endif %}
 
-        <p>
-        <!-- return no selectStudy-->
-        <br>
-        <a href = "{% url 'selectStudy' %}">Return to main select study menu</a>  
-        </p>
+        <button type="button" data-toggle="modal" data-target="#editLimitsModal">
+            Edit max and min values
+        </button>
+        <br><br>
 
+        <p><a href="{% url 'selectStudy' %}">Return to main select study menu</a></p>
+
+        <!-- Modal Structure -->
+        <div class="modal fade" id="editLimitsModal" tabindex="-1" role="dialog" aria-labelledby="editLimitsModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editLimitsModalLabel">Edit Plant Height Limits</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editLimitsForm">
+                            <div class="form-group">
+                                <label for="minValue">Min Value:</label>
+                                <input type="number" class="form-control" id="minValue" name="min">
+                            </div>
+                            <div class="form-group">
+                                <label for="maxValue">Max Value:</label>
+                                <input type="number" class="form-control" id="maxValue" name="max">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bootstrap JS -->
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    
+        <script>
+            // Toggle required attribute based on modal state
+            $('#editLimitsModal').on('shown.bs.modal', function () {
+                document.getElementById('minValue').required = true;
+                document.getElementById('maxValue').required = true;
+            });
+
+            $('#editLimitsModal').on('hidden.bs.modal', function () {
+                document.getElementById('minValue').required = false;
+                document.getElementById('maxValue').required = false;
+            });
+
+            // Form submission for modal
+            document.addEventListener('DOMContentLoaded', function () {
+                var editForm = document.getElementById('editLimitsForm');
+                if (editForm) {
+                    editForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+            
+                        var minValue = document.getElementById('minValue').value;
+                        var maxValue = document.getElementById('maxValue').value;
+                        var studyId = '{{ studyID }}';
+            
+                        var data = {
+                            "Plant height": {
+                                "min": parseInt(minValue, 10),
+                                "max": parseInt(maxValue, 10)
+                            }
+                        };
+            
+                        fetch(`https://grassroots.tools/photo_receiver/update_limits/${studyId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify(data),
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                return response.json();
+                            }
+                            throw new Error('Network response was not ok.');
+                        })
+                        .then(data => {
+                            console.log('Success:', data);
+                            $('#editLimitsModal').modal('hide');
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+                    });
+                }
+            });
+            
+        </script>
     </body>
 </html>
